@@ -1,0 +1,2 @@
+#ignore enviroment config file for secrets
+.env
