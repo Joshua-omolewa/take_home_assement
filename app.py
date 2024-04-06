@@ -1,8 +1,14 @@
+#importing relevant libraries for project
 import os
+import logging 
 import requests
 import time
 import psycopg2
+from dotenv import load_dotenv
+import pandas as pd 
 
+# Load the environment variables 
+load_dotenv()
 
 def connect_to_db():
     conn = psycopg2.connect(
