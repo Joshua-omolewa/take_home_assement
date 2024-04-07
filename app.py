@@ -8,13 +8,25 @@ import time
 import psycopg2
 from dotenv import load_dotenv
 import pandas as pd 
+from etl import * # importing all funciton from our ETL script
 
 # configuring logging
 logging.basicConfig(level=logging.INFO,
                         format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Load the environment variables 
-load_dotenv()
+# load_dotenv()
+
+
+# #database connection configuration
+# host=os.environ["DATABASE_HOST"],
+# # dbname=os.environ["DATABASE_NAME"],
+# user=os.environ["DATABASE_USER"],
+# password=os.environ["DATABASE_PASSWORD"]
+
+
+
+
 
 # def connect_to_db():
 #     conn = psycopg2.connect(
@@ -117,7 +129,7 @@ def extract_book_data(book_id):
         data = response.json()
 
         data_extracted.append(data)  # Append extracted data
-        logging.info(f"Extract data from  API for book id {book_id}")
+        logging.info(f"Extracted data  successfully from  API for book id {book_id}")
     except requests.RequestException as e:
         logging.error(f"Error fetching data from {url}: {str(e)}")
     
@@ -165,98 +177,91 @@ def extract_book(changes_list):
             return change.get('key', '').split('/')[2]
     return None
 
+
+def execute_sql_from_file(sql_file, connection):
+    """
+    Execute SQL commands from a file.
+
+    Args:
+        sql_file (str): Path to the SQL file.
+        connection (psycopg2.extensions.connection): PostgreSQL database connection.
+
+    Returns:
+        None
+    """
+    try:
+        cursor = connection.cursor()
+
+        # Open and read the SQL file
+        with open(sql_file, 'r') as file:
+            sql_script = file.read()
+
+        # Execute the SQL script
+        cursor.execute(sql_script)
+        connection.commit()
+
+        logging.info("SQL script executed successfully")
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logging.error("Error executing SQL script: %s", error)
+
+
+def create_databse_connection():
+ 
+    try:
+        connection = psycopg2.connect(
+            host=os.environ["DATABASE_HOST"],
+            dbname=os.environ["DATABASE_NAME"],
+            user=os.environ["DATABASE_USER"],
+            password=os.environ["DATABASE_PASSWORD"],
+        )
+
+        # Get the path to the directory of the current script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Construct the path to the SQL file
+        sql_file_path = os.path.join(script_dir, 'create_tables.sql')
+
+        # Call the function to execute the SQL script
+        execute_sql_from_file(sql_file_path, connection)
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logging.error("Error connecting to PostgreSQL database: %s", error)
+
+    finally:
+        # Close the database connection
+        if connection:
+            connection.close()
+
+
 if __name__ == "__main__":
 
     #generating date based on requirement for project
     dates = generate_date(api_start_date,api_end_date)
 
-    ## DATA EXTRACTION ##
-    # data = {}  
-    # for single_date in dates:
-    #     formatted_date = single_date.strftime("%Y/%m/%d")
-    #     for single_kind  in extract_set:
-    #         data_for_endpoint = {}
-    #         extracted_data = extract_data(formatted_date, single_kind,offset, limit)
-    #         if extracted_data is not None:
-    #                             data_for_endpoint[formatted_date] = extracted_data
-    #     data[single_kind] = data_for_endpoint
 
-    ## DATA EXTRACTION ##
     ####### DATA EXTRACTION 1 #######
-    extracted_data_frames = []  # To store DataFrames for each endpoint's data
+    final_df = data_extraction1(dates,extract_set,offset,limit)
 
-    for single_date in dates:
-        formatted_date = single_date.strftime("%Y/%m/%d")
-        for single_kind in extract_set:
-            extracted_data = extract_data(formatted_date, single_kind, offset, limit)
-            if extracted_data is not None:
-                # Convert extracted data into a DataFrame
-                df = pd.DataFrame(extracted_data)
-                # Add columns for date and kind
-                df['date'] = formatted_date
-                df['kind'] = single_kind
-                # Append the DataFrame to the list
-                extracted_data_frames.append(df)
-
-    # Concatenate all DataFrames into a single DataFrame
-    final_df = pd.concat(extracted_data_frames, ignore_index=True)
-
-    #changing datatype to timestamp for date columns
-    final_df['date'] = pd.to_datetime(df['date'])
-    final_df['timestamp'] = pd.to_datetime(df['timestamp'])
 
     ####### DATA TRANSFORMATION #######
+    final_df2 = data_transformation(final_df)
 
-    final_df2 = final_df.copy() # creating a copy of final dataframe
 
+    final_df2.to_csv("bookdata.csv") # exporting book raw data for future use incase of backfill
 
-    final_df2['changes'] = final_df2['changes'].apply(filter_books) # Filtering daframe changes column to only include books
-
-    final_df_filtered_copy = final_df2.copy() # creating a copy of filtered final dataframe
-
-    final_df_filtered_copy.loc[:, 'book'] = final_df2['changes'].apply(extract_book) #adding a new column called books to contained extracted book id
-
-    # Drop rows with missing values only in specific columns
-    final_df_filtered_copy = final_df_filtered_copy.dropna(subset=['book'])
-
-    
-    final_df_filtered_copy .to_csv("table1.csv")
-
-    print(final_df_filtered_copy.columns)
-    print(final_df_filtered_copy.info())
+    print(final_df2.info()) #checking columns its data type
 
 
     ####### DATA EXTRACTION 2 #######
+    df_without_duplicates = data_extraction_2(final_df2)
 
-    # Create an empty list to store extracted data
-    extracted_data2 = []
+    df_without_duplicates.to_csv("book_data_extracted.csv") # exporting book raw data for future use incase of backfill
 
-    # Iterate over 'book' column in final_df_filtered_copy
-    for book_id in final_df_filtered_copy['book']:
-        # Extract data for each book ID
-        book_data = extract_book_data(book_id)
-        if book_data is not None:
-            # Extend extracted_data list with data for this book along with the book ID
-            for data in book_data:
-                data['book'] = book_id
-            extracted_data2.extend(book_data)
+    print(df_without_duplicates.info()) #checking columns its data type
 
-
-    second_final_df  = pd.DataFrame(extracted_data2)
-    # print(second_final_df)
-    second_final_df.to_csv("table2_with_duplicate.csv")
-
-    # Drop duplicates based on one column
-    df_without_duplicates = second_final_df.drop_duplicates(subset=['book'])
-
-    # Drop rows with missing values only in specific columns
-    df_without_missing_values = df_without_duplicates.dropna(subset=['book'])
-
-    # print(df_without_duplicates)
-    df_without_duplicates.to_csv("table2_without_duplicate.csv")
-
-    print(df_without_missing_values.columns)
-    print(df_without_missing_values.info())
+    #### CREATE TABLES ####
+    create_databse_connection()
 
 
 
