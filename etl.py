@@ -109,7 +109,7 @@ def data_extraction_2(final_df2):
 
     second_final_df  = pd.DataFrame(extracted_data2)
     # # print(second_final_df)
-    # second_final_df.to_csv("table2_with_duplicate.csv")
+   
 
     # Drop duplicates based on book column
     df_without_duplicates = second_final_df.drop_duplicates(subset=['book'])

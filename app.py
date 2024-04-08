@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.INFO,
                         format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Load the environment variables 
-# load_dotenv()
+load_dotenv()
 
 
 # #database connection configuration
@@ -182,12 +182,10 @@ def execute_sql_from_file(sql_file, connection):
     """
     Execute SQL commands from a file.
 
-    Args:
-        sql_file (str): Path to the SQL file.
-        connection (psycopg2.extensions.connection): PostgreSQL database connection.
+    sql_file (str): Path to the SQL file.
+    connection (psycopg2.extensions.connection): PostgreSQL database connection.
 
-    Returns:
-        None
+    Returns: None
     """
     try:
         cursor = connection.cursor()
@@ -236,31 +234,35 @@ def create_databse_connection():
 
 if __name__ == "__main__":
 
-    #generating date based on requirement for project
+    # generating dates based on requirements for project
     dates = generate_date(api_start_date,api_end_date)
 
 
     ####### DATA EXTRACTION 1 #######
+    # extracting raw data from API
     final_df = data_extraction1(dates,extract_set,offset,limit)
 
 
     ####### DATA TRANSFORMATION #######
+    # transforming data by removing null values, duplicate and also adding new fields
     final_df2 = data_transformation(final_df)
 
 
     final_df2.to_csv("bookdata.csv") # exporting book raw data for future use incase of backfill
 
-    print(final_df2.info()) #checking columns its data type
+    print(final_df2.info()) #checking columns and its data type
 
 
     ####### DATA EXTRACTION 2 #######
+    # to extract data from the API based on the changes field for one book
     df_without_duplicates = data_extraction_2(final_df2)
 
     df_without_duplicates.to_csv("book_data_extracted.csv") # exporting book raw data for future use incase of backfill
 
-    print(df_without_duplicates.info()) #checking columns its data type
+    print(df_without_duplicates.info()) # checking columns and its data type
 
     #### CREATE TABLES ####
+    # connecting to database to create the tables to matc
     create_databse_connection()
 
 
