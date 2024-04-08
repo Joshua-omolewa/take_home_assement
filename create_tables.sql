@@ -1,5 +1,4 @@
 CREATE TABLE IF NOT EXISTS books (
-    book VARCHAR PRIMARY KEY NOT NULL,
     type VARCHAR,
     authors VARCHAR,
     local_id VARCHAR,
@@ -20,6 +19,7 @@ CREATE TABLE IF NOT EXISTS books (
     revision INTEGER,
     created VARCHAR,
     last_modified VARCHAR,
+    book VARCHAR PRIMARY KEY NOT NULL,
     number_of_pages FLOAT,
     notes VARCHAR,
     edition_name VARCHAR,
@@ -38,24 +38,39 @@ CREATE TABLE IF NOT EXISTS books (
     dewey_decimal_class VARCHAR,
     contributors VARCHAR,
     series VARCHAR,
-    translation_of VARCHAR,
-    table_of_contents VARCHAR,
-    full_title VARCHAR,
     ocaid VARCHAR,
-    contributions VARCHAR,
-    ia_box_id VARCHAR,
-    ia_loaded_id VARCHAR,
+    table_of_contents VARCHAR,
     copyright_date VARCHAR,
+    description VARCHAR,
+    full_title VARCHAR,
     lccn VARCHAR,
     first_sentence VARCHAR,
-    description VARCHAR,
-    subject_time VARCHAR,
+    ia_box_id VARCHAR,
+    contributions VARCHAR,
     genres VARCHAR,
-    links VARCHAR
+    translated_from VARCHAR,
+    translation_of VARCHAR,
+    subject_people VARCHAR,
+    work_titles VARCHAR,
+    uri_descriptions VARCHAR,
+    url VARCHAR,
+    uris VARCHAR,
+    ia_loaded_id VARCHAR,
+    subject_place VARCHAR,
+    subject_time VARCHAR,
+    links VARCHAR,
+    location VARCHAR,
+    subject_times VARCHAR,
+    work_title VARCHAR,
+    oclc_number VARCHAR,
+    isbn_invalid VARCHAR,
+    openlibrary VARCHAR,
+    coverimage VARCHAR,
+    scan_records VARCHAR,
+    scan_on_demand VARCHAR
 );
 
-
-CREATE TABLE IF NOT EXISTS my_table (
+CREATE TABLE IF NOT EXISTS request_changes (
     id VARCHAR PRIMARY KEY,
     kind VARCHAR,
     timestamp TIMESTAMP,
@@ -66,5 +81,5 @@ CREATE TABLE IF NOT EXISTS my_table (
     data VARCHAR,
     date TIMESTAMP,
     book VARCHAR,
-    FOREIGN KEY (book) REFERENCES books(book)
+    FOREIGN KEY (book) REFERENCES books(book) ON DELETE CASCADE
 );
