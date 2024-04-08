@@ -1,7 +1,11 @@
+#Author: Joshua Omolewa
+
 import pandas as pd
 import logging
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor
+
+### THE SECTION BELOW CONTAINS FUNCTIONS USED FOR THE ETL PROCESS ##
 
 def data_extraction1(dates,kind,offset, limit):
 
@@ -123,39 +127,3 @@ def data_extraction_2(final_df2, batch_size=100, max_workers=4):
     second_final_df = pd.DataFrame(generate_results())
 
     return second_final_df
-
-
-
-##  CODE BELOW IS IRRELEVANT AS IT IS TOO SLOW, BUT THIS WAS THE FIRST VERSION OF MY SOLUTION AND IT WORK WELL WITH SMALL DATA
-# def data_extraction_2(final_df2):
-
-#     """
-#     This function extract the book data from API,
-#     loads data into a data frame, do some transformation 
-#     to remove duplicates and missing values
-#     and returns the transformed data frame
-
-#     final_df2(dataframe)
-
-#     returns dataframe
-#     """
-
-#     # to avoid Circular imports I need to import other functions from app.py
-#     from app import extract_book_data
-
-#    # Create an empty list to store extracted data
-#     extracted_data2 = []
-
-#     # Iterate over 'book' column in final_df_filtered_copy
-#     for book_id in  final_df2['book']:
-#         # Extract data for each book ID
-#         book_data = extract_book_data(book_id)
-#         if book_data is not None:
-#             # Extend extracted_data list with data for this book along with the book ID
-#             for data in book_data:
-#                 data['book'] = book_id
-#             extracted_data2.extend(book_data)
-
-#     second_final_df  = pd.DataFrame(extracted_data2)
-#     # # print(second_final_df)
-#     return second_final_df 

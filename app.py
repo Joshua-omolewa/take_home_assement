@@ -1,12 +1,13 @@
 #Author: Joshua Omolewa
 
-#importing relevant libraries an modules for project
+#importing relevant modules, packages and libraries for project
 import os
 import logging 
 from io import StringIO
 import requests
 import time
 import psycopg2
+import dotenv
 from dotenv import load_dotenv
 import pandas as pd 
 from etl import * # importing all funciton from our ETL script
@@ -30,6 +31,9 @@ offset = 0
 limit = 1000
 
 
+### THE SECTION BELOW CONTAINS SOME FUNCTIONS USED FOR THE PROJECT PROCESS ###
+# OTHER FUNCTIONS CAN BE FOUND IN THE elt.py SCRIPT
+
 def extract_data(specific_date, kind, offset_value, limit_value):
     """
     This function returns the data extracted in a list format from the API
@@ -51,7 +55,7 @@ def extract_data(specific_date, kind, offset_value, limit_value):
             logging.info(f"Connecting to API to extract data from {specific_date} of kind {kind} and current offset is {offset}")
 
             params = {"limit": limit , "offset":offset} # query string for API
-            # params = {"limit": limit } # query string for API for testing purpose only
+            # params = {"limit": limit } # query string for API for testing purpose only and not required
 
             url = f"http://openlibrary.org/recentchanges/{specific_date}/{kind}.json"
             response = requests.get(url, params=params)
@@ -286,66 +290,6 @@ def load_data(df, table_name):
         cur.close()
         conn.close()
 
-### OLD LOAD DATA FUNCTION BELOW IS NOT GOOD AS IT DOES NOT HANDLE SHCEMA CHANGE DYNAMICALLY HENCE I HAD TO CHANGE IT ###
-# def load_data(df, table_name):
-#     """
-#     Load data from a Pandas DataFrame into a PostgreSQL table using COPY command.
-
-#     This function takes a DataFrame  and a table name as input. It converts
-#     the DataFrame into CSV format using a string buffer and then inserts the data into the specified
-#     PostgreSQL table using the COPY command.
-
-#     df (pandas.DataFrame): The DataFrame containing the data to be inserted.
-#     table_name (str): The name of the PostgreSQL table where the data will be inserted.
-
-#     return: None
-#     """
-
-#     # Create a string buffer
-#     buffer = StringIO()
-#     # Write the DataFrame to the buffer as CSV data with header
-#     df.to_csv(buffer, index=False)
-
-
-#     buffer.seek(0) # sets the file pointer to the beginning of the file-like object because writing to buffer moves pointer to the end
-
-#     try:
-#         # establish connection to the database
-#         conn = psycopg2.connect(
-#             host=os.environ["DATABASE_HOST"],
-#             dbname=os.environ["DATABASE_NAME"],
-#             user=os.environ["DATABASE_USER"],
-#             password=os.environ["DATABASE_PASSWORD"],
-#         )
-
-#         # Create a cursor object
-#         cur = conn.cursor()
-
-#         # Using the COPY command to load data as copy it is faster than insert into DML statment
-#         # I use the copy_expert method of the cursor (cur) to execute the COPY command with more control over the options.
-#         # COPY table_name FROM STDIN: This tells PostgreSQL to copy data from the standard input (our string buffer) into the specified table (table_name).
-#         # WITH CSV HEADER: This indicates that the CSV data includes a header row, which PostgreSQL should use to determine the column names.
-#         # NULL '': This specifies that empty strings in the CSV file should be interpreted as NULL values in the database. 
-#         # This addresses the issue where empty values are represented by commas in the CSV file.
-
-#         cur.copy_expert(f"COPY {table_name} FROM STDIN WITH CSV HEADER NULL ''", buffer) # issue with copy is that there cannot be a primary key confilict
-#         # one alternative is to COPY into a staging table, then use INSERT ... ON CONFLICT (or maybe MERGE) to insert/update the rows into the real table.
-#         # however in this case we only loading data based on specific date hence no concern
-
-#         # Commit the transaction
-#         conn.commit()
-#         logging.info(f"Data inserted into table {table_name} successfully.")
-
-
-#     except Exception as error:
-#         # Log any errors that occur during the process
-#         logging.error(f"Error inserting data into table {table_name}: {error}")
-#         conn.rollback()
-#     finally:
-#         # Close the cursor
-#         cur.close()
-
-
 if __name__ == "__main__":
 
     # generating dates based on requirements for project
@@ -370,18 +314,19 @@ if __name__ == "__main__":
 
 
     ####### DATA EXTRACTION - STEP 3 #######
-    # to extract data from the API based on the changes field for one book
+    # to extract data from the API based on the changes field for each book id
     changes_book_df = data_extraction_2(book_df)
 
     changes_book_df.to_csv("book_data_extracted.csv",index=False) # exporting book raw data for future use incase of backfill
     # print(changes_book_df.info()) # checking columns and its data type
+
 
     #### CREATE TABLES - STEP 4 ####
     # connecting to database to create the tables based on DDL script (create_tables.sql)
     create_databse_tables()
 
 
-    #### LOAD DATA IN DATABASE - STEP 5 ####
+    #### LOADING DATA INTO DATABASE - STEP 5 ####
     # connecting to database and loading data into the database tables
 
     # load data into the books table
@@ -389,9 +334,3 @@ if __name__ == "__main__":
 
     # load data into the request_changes table
     load_data(book_df,"request_changes")
-
-
-
-# if __name__ == "__main__":
-#     print("Data Engineering Take Home Assessment")
-#     connect_to_db()
