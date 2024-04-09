@@ -13,7 +13,7 @@ def data_extraction1(dates,kind,offset, limit):
     This function extract the data from API,
     loads data into a data frame and returns the data frame
 
-    dates(list) dates range
+    dates(DatetimeIndex) dates range generated using pandas range_date method
     kind(str): book kind in in the set (add-cover, add-book, edit-book, merge-authors)
     offset_value(int): specifying API offset
     limit_value(int): specifying API limit

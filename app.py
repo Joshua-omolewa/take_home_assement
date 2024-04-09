@@ -5,7 +5,7 @@ import os
 import logging 
 from io import StringIO
 import requests
-import time
+import pytest
 import psycopg2
 import dotenv
 from dotenv import load_dotenv
@@ -87,6 +87,24 @@ def extract_data(specific_date, kind, offset_value, limit_value):
     
     return data_extracted
 
+def database_connection_test():
+
+    try:
+        connection = psycopg2.connect(
+            host=os.environ["DATABASE_HOST"],
+            dbname=os.environ["DATABASE_NAME"],
+            user=os.environ["DATABASE_USER"],
+            password=os.environ["DATABASE_PASSWORD"],
+        )
+        logging.info("connection to database successful")
+        return True
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        logging.error(f"connection to database not successful {error}")
+        return None
+
+
+
 
 def extract_book_data(book_id):
     """
@@ -112,6 +130,7 @@ def extract_book_data(book_id):
         logging.info(f"Extracted data  successfully from  API for book id {book_id}")
     except requests.RequestException as e:
         logging.error(f"Error fetching data from {url}: {str(e)}")
+        return None
     
     return data_extracted
     
@@ -182,9 +201,10 @@ def execute_sql_from_file(sql_file, connection):
 
     except (Exception, psycopg2.DatabaseError) as error:
         logging.error(f"Error executing SQL script: {error}")
+        return None
 
 
-def create_databse_tables():
+def create_databse_tables(sql_script):
     
     """
     Create database tables by executing SQL commands from a file.
@@ -193,8 +213,9 @@ def create_databse_tables():
     for host, database name, user, and password. It then retrieves the path to an SQL file
     ('create_tables.sql') located in the same directory as the script and executes the SQL commands
     from that file using the `execute_sql_from_file` function.
+    sql_script(str): name of sql DDL script
 
-    return: None
+    return: True if successful, None otherwise
     """
 
     try:
@@ -210,13 +231,15 @@ def create_databse_tables():
         script_dir = os.path.dirname(os.path.abspath(__file__))
 
         # Construct the path to the SQL file
-        sql_file_path = os.path.join(script_dir, 'create_tables.sql')
+        sql_file_path = os.path.join(script_dir, sql_script)
 
         # Call the function to execute the SQL script
         execute_sql_from_file(sql_file_path, connection)
+        return True
 
     except (Exception, psycopg2.DatabaseError) as error:
         logging.error(f"Error connecting to PostgreSQL database: {error}")
+        return None
 
     finally:
         # Close the database connection
@@ -235,19 +258,20 @@ def load_data(df, table_name):
     df (pandas.DataFrame): The DataFrame containing the data to be inserted.
     table_name (str): The name of the PostgreSQL table where the data will be inserted.
 
-    return: None
+    return: True if successful, None otherwise
     """
 
     # Create a string buffer
     buffer = StringIO()
-    
+
     # Write the DataFrame to the buffer as CSV data with header
-    df.to_csv(buffer, index=False)
+    df.to_csv(buffer, index=False, na_rep='NULL')
+
     buffer.seek(0)  # Reset buffer position
 
     try:
         # establish connection to the database
-        conn = psycopg2.connect(
+        connection = psycopg2.connect(
             host=os.environ["DATABASE_HOST"],
             dbname=os.environ["DATABASE_NAME"],
             user=os.environ["DATABASE_USER"],
@@ -255,49 +279,69 @@ def load_data(df, table_name):
         )
 
         # Create a cursor object
-        cur = conn.cursor()
+        cur = connection.cursor()
 
         # Get table columns
         cur.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table_name}'")
         table_columns = [row[0] for row in cur.fetchall()]
 
-        # Filter DataFrame columns based on table columns
-        df = df[[col for col in df.columns if col in table_columns]]
+        # Fill missing columns in DataFrame with NULL
+        for col in table_columns:
+            if col not in df.columns:
+                df[col] = 'NULL'
 
-        # Write the filtered DataFrame to the buffer
-        buffer = StringIO()
-        df.to_csv(buffer, index=False)
+        # showing the missing columns for tracking schema change while loading
+        missing_columns = set(table_columns) - set(df.columns)
+        if missing_columns:
+            logging.warning(f"The following columns are missing from the DataFrame: {', '.join(missing_columns)}")
+
+        # Write the DataFrame to the buffer again after filling missing columns with NULL
+        buffer.seek(0)
+        buffer.truncate(0)
+        df.to_csv(buffer, index=False, na_rep='NULL')
+
         buffer.seek(0)  # Reset buffer position
 
         # Using the COPY command to load data as copy it is faster than insert into DML statment
         # I use the copy_expert method of the cursor (cur) to execute the COPY command with more control over the options.
         # COPY table_name FROM STDIN: This tells PostgreSQL to copy data from the standard input (our string buffer) into the specified table (table_name).
         # WITH CSV HEADER: This indicates that the CSV data includes a header row, which PostgreSQL should use to determine the column names.
-        # NULL '': This specifies that empty strings in the CSV file should be interpreted as NULL values in the database. 
+        # NULL 'NULL': This specifies that empty strings in the CSV file should be interpreted as NULL values in the database. 
         # This addresses the issue where empty values are represented by commas in the CSV file.
-        cur.copy_expert(f"COPY {table_name} FROM STDIN WITH CSV HEADER NULL ''", buffer)
+        cur.copy_expert(f"COPY {table_name} FROM STDIN WITH CSV HEADER NULL 'NULL'", buffer)
 
         # Commit the transaction
-        conn.commit()
+        connection.commit()
         logging.info(f"Data inserted into table {table_name} successfully.")
-
+        return True
     except Exception as error:
         # Log any errors that occur during the process
         logging.error(f"Error inserting data into table {table_name}: {error}")
-        conn.rollback()
+        connection.rollback()
+        return None
     finally:
         # Close the cursor and connection
         cur.close()
-        conn.close()
+        connection.close()
 
 if __name__ == "__main__":
+
+    ############################ Runing  Unit tests ##########################
+
+    retcode = pytest.main([".", "-v", "-p", "no:cacheprovider"]) # this variable store the exit code from pytest  
+
+    # Fail the cell execution if there are any test failures.
+    # As per pytest documentation: Exit code 0: All tests were collected and passed successfully
+    assert retcode == 0, "The pytest test failed. See the log for details."
+
+    logging.info('All unit tests passed. Initiating the ELT process')
 
     # generating dates based on requirements for project
     dates = generate_date(api_start_date,api_end_date)
 
+   
 
-    # PERFORMING THE ETL PROCESS 
-
+    ###################### PERFORMING THE ETL PROCESS ################################
 
     ####### DATA EXTRACTION - STEP 1 #######
     # extracting raw data from API
@@ -323,7 +367,7 @@ if __name__ == "__main__":
 
     #### CREATE TABLES - STEP 4 ####
     # connecting to database to create the tables based on DDL script (create_tables.sql)
-    create_databse_tables()
+    create_databse_tables('create_tables.sql')
 
 
     #### LOADING DATA INTO DATABASE - STEP 5 ####
