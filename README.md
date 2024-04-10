@@ -34,7 +34,7 @@ docker exec -it $(docker-compose ps -q  db) psql -U user -d mydatabase
 
 ### 1 - Setting up environment for the project 
 
-* Created an empty directory called takehomeassement using mkdir takehomeassement
+* Created an empty directory called takehomeassement using `mkdir takehomeassement`
 * Navigate to the takehomeassement directory Unzip assessment content i.e., dock-compose, docker file etc. into this new directory
 * create a git working directory using
 `git init .`
@@ -45,8 +45,8 @@ docker exec -it $(docker-compose ps -q  db) psql -U user -d mydatabase
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/2-%20ubuntu%20.png"  width="100%" height="100%">
 * Rename current branch from master to main using
 `git branch -M main` .This is because the master branch in github is called main hence we change the local branch on pc to main
-* Add all untrack files for assessment to staging area using git add . 
-* Commit changes and add commit message to new files using git commit -m “adding original assessment files”
+* Add all untrack files for assessment to staging area using `git add .` 
+* Commit changes and add commit message to new files using `git commit -m "adding original assessment files"`
 * Push new files to remote repository using `git push -u origin main`
   
 ### 2 - creating local python3.10 environment and local posgres database
