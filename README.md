@@ -19,3 +19,4 @@ docker exec -it $(docker-compose ps -q  db) psql -U user -d mydatabase
 
 # PROJECT ARCHITECTURE
 
+<img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/Project%20Architecture.gif"  width="100%" height="100%">
