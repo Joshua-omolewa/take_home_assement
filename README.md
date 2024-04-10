@@ -105,7 +105,8 @@ docker-compose up --build
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/17-%20checking%20docker%20postgres%20to%20see%20if%20tables%20are%20created.png"  width="100%" height="100%">  
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/18-%20checking%20to%20see%20that%20the%20data%20%20was%20loded%20into%20the%20database%20tables%20successfuly.png"  width="100%" height="100%">  
   
-<h3 style="text-align: center;" markdown="1"> Challenges faced in this project</h3>
+<h1 style="text-align: center;"> Challenges faced in this project</h1>
+
 
 * **SLOW EXTRACTION**: The initial version of my python script was slow for extraction of book data from raw data initially extracted from the API. I had to implement concurrency (using Threadpool executor) to speed up the extraction process utilizing multiple threads .  I followed this article **[here](https://medium.com/@superfastpython/python-threadpoolexecutor-7-day-crash-course-78d4846d5acc )**
 *  
