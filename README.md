@@ -68,7 +68,7 @@ docker exec -it $(docker-compose ps -q  db) psql -U user -d mydatabase
 * Inspecting schema of response from API for each kinds using the requests module, in order to properly model the data  for KINDS in the set (add-cover, add-book, edit-book, merge-authors) 
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/3-%20inspecting%20repsonse.png"  width="100%" height="100%">
 * Created the DDL SQL script called `create_tables.sql` for the project based on the API reponse which can be found   **[here](https://github.com/Joshua-omolewa/take_home_assement/blob/main/create_tables.sql)** 
-* Used Jupyter notebook to inspect the response from the API so I can properly structure my python scripts
+* Used Jupyter notebook to inspect the response from the API so I can properly structure my python scripts. You can find the jupyter notebook  **[here](https://github.com/Joshua-omolewa/take_home_assement/blob/main/Jupyter-notebook-test/Untitled.ipynb)** 
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/13%20-jupyter%20notedbook%20for%20exploration.png"  width="100%" height="100%">
 * I created a separate python file called `etl.py` to encapsulate the extraction and transformation process. The function for loading the data into the data is in the `app.py` python script
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/5-%20data%20extrction.png"  width="100%" height="100%">
