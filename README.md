@@ -76,10 +76,25 @@ docker exec -it $(docker-compose ps -q  db) psql -U user -d mydatabase
 * Tested  data extraction locally using the `app.py` and `etl.py` python scripts. the data extraction in progress as seen in the images below
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/6-%20data%20extraction%20process.png"  width="100%" height="100%">
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/7-%20extracting%20book%20data%20using%20data%20from%20raw%20data.png"  width="100%" height="100%"> 
-* The Extraction and transfromation process completed and then table is  created in database using the `create_tables.sql` script and finally data is loaded into the two tables. Please see images below for the logs and ERD diagram for the databse
-  <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/7-%20extracting%20book%20data%20using%20data%20from%20raw%20data.png"  width="100%" height="100%"> 
-* 
-
-
+* The extraction and transfromation process completed and then table is  created in database using the `create_tables.sql` script and finally data is loaded into the two tables called `books` and `request_changes`. Please see images below for the logs and ERD diagram for the databse
+  <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/8-%20data%20ETL%20proces%20complete.png"  width="100%" height="100%"> 
+  <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/ERD%20diagram.png"  width="100%" height="100%">  
+* Checked database using dbeaver to see if the tables have been created and if data has been loaded into the two tables. Please see images below
+  <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/9-%20checking%20databse%20to%20see%20if%20tables%20have%20been%20created.png"  width="100%" height="100%">
+  <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/10-%20checking%20databse%20to%20see%20if%20tables%20have%20been%20created.png"  width="100%" height="100%"> 
+### 4 - Developing unit tests for the data pipeline
+* prepared unit test using pytest framework. See sample picture below
+ <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/11-unit%20testsmaple%20fialed.png"  width="100%" height="100%">
+* Unit tests created for project include testing the API connection, testing the database connection just to ensure it works correctly as data from the api will be loaded into the database tables, testing the extraction, transformation and loading processes
+  <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/12-%20unit%20test%20passed.png"  width="100%" height="100%"> 
+* Executed the `app.py` python script which includes the unit tests to see if everything works perfectly. As seen in the image below the code works perfectly.
+  <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/14-%20testing%20code%20in%20full%20locally.png"  width="100%" height="100%"> 
+### 5 - Runing python script in a containerized approach using docker with docker compose
+* I ran the entire applicaton using 
+```bash
+docker-compose up --build
+``` 
+*  The unit tests, data extraction, transformation and loading process complete succesfully as seen in the images below
+  <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/15-%20testing%20script%20runing%20in%20docker%20environment.png"  width="100%" height="100%">  
 
 
