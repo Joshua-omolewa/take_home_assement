@@ -85,18 +85,24 @@ docker exec -it $(docker-compose ps -q  db) psql -U user -d mydatabase
 ### 4 - Developing unit tests for the data pipeline
 * prepared unit test using pytest framework. See sample picture below
  <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/11-unit%20testsmaple%20fialed.png"  width="100%" height="100%">
- 
+
 * Unit tests created for project include testing the API connection, testing the database connection just to ensure it works correctly as data from the api will be loaded into the database tables, testing the extraction, transformation and loading processes
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/12-%20unit%20test%20passed.png"  width="100%" height="100%"> 
 * Executed the `app.py` python script which includes the unit tests to see if everything works perfectly. As seen in the image below the code works perfectly.
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/14-%20testing%20code%20in%20full%20locally.png"  width="100%" height="100%"> 
 
 ### 5 - Runing python script in a containerized approach using docker with docker compose
-* I ran the entire applicaton using 
+* I executed the entire applicaton using 
 ```bash
 docker-compose up --build
 ``` 
-*  The unit tests, data extraction, transformation and loading process complete succesfully as seen in the images below
+*  The unit tests, data extraction, transformation and loading process executed succesfully as seen in the images below
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/15-%20testing%20script%20runing%20in%20docker%20environment.png"  width="100%" height="100%">  
+  <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/16-%20script%20ran%20correctly%20in%20dockerized%20environment.png"  width="100%" height="100%">  
+
+* Login into database in docker compose to confirm that the tables were created using `docker exec -it $(docker-compose ps -q  db) psql -U user -d mydatabase` and executed the commands `\l` to see the users in the databaseand `\d` to see the tables in the database. I then executed an SQL query `SELECT * FROM book LIMIT 1` to confirm that the data was succesfully loaded into the database. Please see images below
+  <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/17-%20checking%20docker%20postgres%20to%20see%20if%20tables%20are%20created.png"  width="100%" height="100%">  
+  <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/18-%20checking%20to%20see%20that%20the%20data%20%20was%20loded%20into%20the%20database%20tables%20successfuly.png"  width="100%" height="100%">  
+  
 
 
