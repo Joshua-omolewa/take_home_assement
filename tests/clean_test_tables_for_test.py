@@ -5,7 +5,7 @@ import logging
 
 def clean_database_test_tables():
     """
-    This function is used to clean up the tables created from the loadin test scrippt
+    This function is used to clean up the tables created from the loading test scrippt
     """
     try:
         connection = psycopg2.connect(
