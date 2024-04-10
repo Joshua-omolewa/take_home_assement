@@ -47,7 +47,7 @@ docker exec -it $(docker-compose ps -q  db) psql -U user -d mydatabase
 `git branch -M main` .This is because the master branch in github is called main hence we change the local branch on pc to main
 * Add all untrack files for assessment to staging area using `git add .` 
 * Commit changes and add commit message to new files using `git commit -m "adding original assessment files"`
-* Push new files to remote repository using `git push -u origin main`
+* Push new files to remote repository using `git push origin -u main`
   
 ### 2 - creating local python3.10 environment and local posgres database
 
