@@ -26,7 +26,7 @@ docker exec -it $(docker-compose ps -q  db) psql -U user -d mydatabase
 
 * **OS**: Ubuntu (Virtual machine - WSL)
 * **Installation**: Installed docker, docker compose, jupyter noteboook
-* **Integrated** Development Environment (IDE): VSCODE
+* **Integrated Development Environment (IDE)**: VSCODE
 * **Tools**: Dbeaver (for connecting to my local postgres database runing in docker container)
 * **Python version**: python3.10 as per project requirements
 
@@ -51,22 +51,23 @@ docker exec -it $(docker-compose ps -q  db) psql -U user -d mydatabase
   
 ### 2 - creating local python3.10 environment and local posgres database
 
-* I created local python3.10 environment using python virtual environment and local database runing on docker using `docker run --name weclouddwh -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=post123 -p 5432:5432 -v /home/ubuntu/weclouddwh-data:/var/lib/postgresql/data -d postgres:alpine3.18` and the username is `postgres` and password is `post123` 
+* I created a local python3.10 environment using python virtual environment and local database runing on docker using `docker run --name weclouddwh -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=post123 -p 5432:5432 -v /home/ubuntu/weclouddwh-data:/var/lib/postgresql/data -d postgres:alpine3.18` and the username is `postgres` and password is `post123` 
  
-* Create a python 3.10 virtual environment (joshua-python3) for project so I can run python script locally before using docker compost to run python script as it is based on python3.10 to avoid dependency issue. I ran the following commands to create and activate the python virtual environment 
+* Created a python 3.10 virtual environment (joshua-python3) for project so I can run python script locally before using docker compost to run python script as it is based on python3.10 to avoid dependency issue. I ran the following commands to create and activate the python virtual environment 
 `sudo apt install python3.10-venv` , 
 `python3.10 -m venv joshua-python3` , 
 `source joshua-python3/bin/activate` 
-* created a .env fie to store credential of my local postgres databse
-* created  .gitignore file to exclude the .env file from being tracked, so I can test code locally using .env file with local postgres database for faster development before containerizing code 
+* Created a .env fie to store credential of my local postgres databse
+* Created  .gitignore file to exclude the .env file from being tracked, so I can test code locally using .env file with local postgres database for faster development before containerizing code 
 
 ### 3 - Developing code for project 
 * Install requests, pandas, psycopg2, dotenv using `pip install requests`, `pip install psycopg2-binary`, `pip install pandas`, `pip install python-dotenv` and then importing the relevant modules into the app.py python script
-* Developed the python script to extract data from the API by important the relevant libraries (modules) and using requests library and paginate through the response using offset as shown in the API documentation 
+* Developed the python script to extract data from the API by importing the relevant libraries (modules) and using requests library and paginate through the response using offset as shown in the  **[API documentation](https://openlibrary.org/dev/docs/api/recentchanges)** 
 
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/4-%20importing%20libraries.png"  width="100%" height="100%">
-* Inspecting schema of response in order to properly model the data  for KINDS in the set (add-cover, add-book, edit-book, merge-authors) using the requests module
+* Inspecting schema of response from API for each kinds using the requests module, in order to properly model the data  for KINDS in the set (add-cover, add-book, edit-book, merge-authors) 
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/3-%20inspecting%20repsonse.png"  width="100%" height="100%">
- 
+
+
 
 
