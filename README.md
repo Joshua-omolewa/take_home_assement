@@ -85,10 +85,12 @@ docker exec -it $(docker-compose ps -q  db) psql -U user -d mydatabase
 ### 4 - Developing unit tests for the data pipeline
 * prepared unit test using pytest framework. See sample picture below
  <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/11-unit%20testsmaple%20fialed.png"  width="100%" height="100%">
+ 
 * Unit tests created for project include testing the API connection, testing the database connection just to ensure it works correctly as data from the api will be loaded into the database tables, testing the extraction, transformation and loading processes
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/12-%20unit%20test%20passed.png"  width="100%" height="100%"> 
 * Executed the `app.py` python script which includes the unit tests to see if everything works perfectly. As seen in the image below the code works perfectly.
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/14-%20testing%20code%20in%20full%20locally.png"  width="100%" height="100%"> 
+
 ### 5 - Runing python script in a containerized approach using docker with docker compose
 * I ran the entire applicaton using 
 ```bash
