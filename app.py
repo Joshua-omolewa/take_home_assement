@@ -1,6 +1,6 @@
-#Author: Joshua Omolewa
+# Author: Joshua Omolewa
 
-#importing relevant modules, packages and libraries for project
+# importing relevant modules, packages and libraries for project
 import os
 import logging 
 from io import StringIO
@@ -10,7 +10,7 @@ import psycopg2
 import dotenv
 from dotenv import load_dotenv
 import pandas as pd 
-from etl import * # importing all function from our ETL script
+from etl import * # importing all functions from our ETL script
 
 # configuring logging
 logging.basicConfig(level=logging.INFO,
