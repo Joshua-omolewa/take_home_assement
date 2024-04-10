@@ -104,5 +104,10 @@ docker-compose up --build
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/17-%20checking%20docker%20postgres%20to%20see%20if%20tables%20are%20created.png"  width="100%" height="100%">  
   <img src="https://github.com/Joshua-omolewa/take_home_assement/blob/main/images/18-%20checking%20to%20see%20that%20the%20data%20%20was%20loded%20into%20the%20database%20tables%20successfuly.png"  width="100%" height="100%">  
   
+<h3 style="text-align: center;" markdown="1"> Challenges faced in this project</h3>
+
+* **SLOW EXTRACTION**: Initial version of my python script was slow for extraction of book data from raw data initally extraced from the API. I had to implement concurrency (using Threadpool executor) to speed up the extraction process utilizing multiple threads .  I followed this ariticle **[here](https://medium.com/@superfastpython/python-threadpoolexecutor-7-day-crash-course-78d4846d5acc )**
+*  
+* **SCHEMA CHANGE ISSUE** Schema change for data extracted was an issue  and I needed to handle change dynamically because  I noticed that when I extracted a small subset of data, the schema was different as compared to the shcema gotten from the API when I extracted all the data at once, hence I had to handle the schema change dynamically. This is expected as the Request changes API documentation states that the API has been updated so many times, hence no concern
 
 
