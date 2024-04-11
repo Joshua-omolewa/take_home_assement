@@ -53,7 +53,7 @@ docker exec -it $(docker-compose ps -q  db) psql -U user -d mydatabase
 
 * I created a local python3.10 environment using python virtual environment and local database runing on docker using `docker run --name weclouddwh -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=post123 -p 5432:5432 -v /home/ubuntu/weclouddwh-data:/var/lib/postgresql/data -d postgres:alpine3.18` and the username is `postgres` and password is `post123` 
  
-* Created a python 3.10 virtual environment (joshua-python3) for project so I can run python script locally before using docker compost to run python script as it is based on python3.10 to avoid dependency issue. I ran the following commands to create and activate the python virtual environment 
+* Created a python 3.10 virtual environment (joshua-python3) for project so I can run python script locally before using docker compose to run python script as it is based on python3.10 to avoid dependency issue. I ran the following commands to create and activate the python virtual environment 
 `sudo apt install python3.10-venv` , 
 `python3.10 -m venv joshua-python3` , 
 `source joshua-python3/bin/activate` 
